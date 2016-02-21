@@ -6910,14 +6910,14 @@ Elm.Main.make = function (_elm) {
    var halfHeight = _p3._1;
    var defaultGame = {state: Pause,ball: {x: 0,y: 0,vx: 200,vy: 200},player1: player(20 - halfWidth),player2: player(halfWidth - 20)};
    var ballOffCourt = function (ball) {    return $Basics.not(A3(near,0,halfWidth,ball.x));};
-   var ballAtTopOrBottomOfCourt = function (ball) {    return _U.cmp(ball.y,7 - halfHeight) < 0 || _U.cmp(ball.y,halfHeight - 7) > 0;};
+   var ballAtTopOfCourt = function (ball) {    return _U.cmp(ball.y,7 - halfHeight) < 0;};
+   var ballAtBottomOfCourt = function (ball) {    return _U.cmp(ball.y,halfHeight - 7) > 0;};
    var stepBall = F4(function (t,_p4,player1,player2) {
       var _p5 = _p4;
       var _p6 = _p5;
       return ballOffCourt(_p6) ? _U.update(_p6,{x: 0,y: 0}) : A2(updatePosition,
       t,
-      _U.update(_p6,
-      {vx: A3(stepV,_p5.vx,A2(within,_p6,player1),A2(within,_p6,player2)),vy: A3(stepV,_p5.vy,ballAtTopOrBottomOfCourt(_p6),ballAtTopOrBottomOfCourt(_p6))}));
+      _U.update(_p6,{vx: A3(stepV,_p5.vx,A2(within,_p6,player1),A2(within,_p6,player2)),vy: A3(stepV,_p5.vy,ballAtTopOfCourt(_p6),ballAtBottomOfCourt(_p6))}));
    });
    var stepPlayer = F4(function (t,dir,points,player) {
       var score$ = player.score + points;
@@ -7001,7 +7001,8 @@ Elm.Main.make = function (_elm) {
                              ,updatePosition: updatePosition
                              ,stepBall: stepBall
                              ,ballOffCourt: ballOffCourt
-                             ,ballAtTopOrBottomOfCourt: ballAtTopOrBottomOfCourt
+                             ,ballAtTopOfCourt: ballAtTopOfCourt
+                             ,ballAtBottomOfCourt: ballAtBottomOfCourt
                              ,stepPlayer: stepPlayer
                              ,stepGame: stepGame
                              ,gameState: gameState

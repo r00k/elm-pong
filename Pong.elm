@@ -112,16 +112,20 @@ stepBall t ({x,y,vx,vy} as ball) player1 player2 =
             vx =
               stepV vx (ball `within` player1) (ball `within` player2),
             vy =
-              stepV vy (ballAtTopOrBottomOfCourt ball) (ballAtTopOrBottomOfCourt ball)
+              stepV vy (ballAtTopOfCourt ball) (ballAtBottomOfCourt ball)
         }
 
 ballOffCourt : Ball -> Bool
 ballOffCourt ball =
   not <| near 0 halfWidth ball.x
 
-ballAtTopOrBottomOfCourt : Ball -> Bool
-ballAtTopOrBottomOfCourt ball =
-  (ball.y < 7-halfHeight) || (ball.y > halfHeight-7)
+ballAtTopOfCourt : Ball -> Bool
+ballAtTopOfCourt ball =
+  (ball.y < 7-halfHeight)
+
+ballAtBottomOfCourt : Ball -> Bool
+ballAtBottomOfCourt ball =
+  (ball.y > halfHeight-7)
 
 -- step a player forward, making sure it does not fly off the court
 stepPlayer : Time -> Int -> Int -> Player -> Player
