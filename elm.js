@@ -6903,12 +6903,12 @@ Elm.Main.make = function (_elm) {
    var within = F2(function (ball,player) {    return A3(near,player.x,8,ball.x) && A3(near,player.y,20,ball.y);});
    var player = function (x) {    return {x: x,y: 0,vx: 0,vy: 0,score: 0};};
    var Game = F4(function (a,b,c,d) {    return {state: a,ball: b,player1: c,player2: d};});
-   var Pause = {ctor: "Pause"};
-   var Play = {ctor: "Play"};
+   var NotRunning = {ctor: "NotRunning"};
+   var IsRunning = {ctor: "IsRunning"};
    var _p3 = {ctor: "_Tuple2",_0: 300,_1: 200};
    var halfWidth = _p3._0;
    var halfHeight = _p3._1;
-   var defaultGame = {state: Pause,ball: {x: 0,y: 0,vx: 200,vy: 200},player1: player(20 - halfWidth),player2: player(halfWidth - 20)};
+   var defaultGame = {state: NotRunning,ball: {x: 0,y: 0,vx: 200,vy: 200},player1: player(20 - halfWidth),player2: player(halfWidth - 20)};
    var ballOffCourt = function (ball) {    return $Basics.not(A3(near,0,halfWidth,ball.x));};
    var ballAtTopOfCourt = function (ball) {    return _U.cmp(ball.y,7 - halfHeight) < 0;};
    var ballAtBottomOfCourt = function (ball) {    return _U.cmp(ball.y,halfHeight - 7) > 0;};
@@ -6938,8 +6938,8 @@ Elm.Main.make = function (_elm) {
       var paddle1 = _p8.paddle1;
       var paddle2 = _p8.paddle2;
       var delta = _p8.delta;
-      var state$ = space ? Play : !_U.eq(score1,score2) ? Pause : state;
-      var ball$ = _U.eq(state,Pause) ? ball : A4(stepBall,delta,ball,player1,player2);
+      var state$ = space ? IsRunning : !_U.eq(score1,score2) ? NotRunning : state;
+      var ball$ = _U.eq(state,NotRunning) ? ball : A4(stepBall,delta,ball,player1,player2);
       var player1$ = A4(stepPlayer,delta,paddle1,score1,player1);
       var player2$ = A4(stepPlayer,delta,paddle2,score2,player2);
       return _U.update(game,{state: state$,ball: ball$,player1: player1$,player2: player2$});
@@ -6968,7 +6968,7 @@ Elm.Main.make = function (_elm) {
               ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: gameHeight / 2 - 40},$Graphics$Collage.toForm(scores))
               ,A2($Graphics$Collage.move,
               {ctor: "_Tuple2",_0: 0,_1: 40 - gameHeight / 2},
-              $Graphics$Collage.toForm(_U.eq(_p13.state,Play) ? A2($Graphics$Element.spacer,1,1) : A2(txt,$Basics.identity,msg)))])));
+              $Graphics$Collage.toForm(_U.eq(_p13.state,IsRunning) ? A2($Graphics$Element.spacer,1,1) : A2(txt,$Basics.identity,msg)))])));
    });
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
    var Input = F4(function (a,b,c,d) {    return {space: a,paddle1: b,paddle2: c,delta: d};});
@@ -6980,8 +6980,8 @@ Elm.Main.make = function (_elm) {
    A2($Signal.map,function (_) {    return _.y;},$Keyboard.wasd),
    A2($Signal.map,function (_) {    return _.y;},$Keyboard.arrows),
    delta));
-   var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
-   var main = A3($Signal.map2,display,$Window.dimensions,gameState);
+   var gameRunning = A3($Signal.foldp,stepGame,defaultGame,input);
+   var main = A3($Signal.map2,display,$Window.dimensions,gameRunning);
    return _elm.Main.values = {_op: _op
                              ,Input: Input
                              ,delta: delta
@@ -6990,8 +6990,8 @@ Elm.Main.make = function (_elm) {
                              ,gameWidth: gameWidth
                              ,halfHeight: halfHeight
                              ,halfWidth: halfWidth
-                             ,Play: Play
-                             ,Pause: Pause
+                             ,IsRunning: IsRunning
+                             ,NotRunning: NotRunning
                              ,Game: Game
                              ,player: player
                              ,defaultGame: defaultGame
@@ -7005,7 +7005,7 @@ Elm.Main.make = function (_elm) {
                              ,ballAtBottomOfCourt: ballAtBottomOfCourt
                              ,stepPlayer: stepPlayer
                              ,stepGame: stepGame
-                             ,gameState: gameState
+                             ,gameRunning: gameRunning
                              ,pongGreen: pongGreen
                              ,textGreen: textGreen
                              ,txt: txt

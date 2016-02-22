@@ -44,10 +44,10 @@ type alias Player =
     Moveable { score : Int }
 
 -- Make this type Running = True | False
-type State = Play | Pause
+type Running = IsRunning | NotRunning
 
 type alias Game =
-    { state : State
+    { state : Running
     , ball : Ball
     , player1 : Player
     , player2 : Player
@@ -60,7 +60,7 @@ player x =
 
 defaultGame : Game
 defaultGame =
-    { state   = Pause
+    { state   = NotRunning
     , ball    = { x=0, y=0, vx=200, vy=200 }
     , player1 = player (20-halfWidth)
     , player2 = player (halfWidth-20)
@@ -153,16 +153,16 @@ stepGame input game =
     -- this could be clearer
     state' =
         if space then
-           Play
+            IsRunning
 
         else if score1 /= score2 then
-            Pause
+            NotRunning
 
         else
             state
 
     ball' =
-        if state == Pause
+        if state == NotRunning
             then ball
             else stepBall delta ball player1 player2
 
@@ -177,8 +177,8 @@ stepGame input game =
       }
 
 
-gameState : Signal Game
-gameState =
+gameRunning : Signal Game
+gameRunning =
     Signal.foldp stepGame defaultGame input
 
 
@@ -212,9 +212,9 @@ display (w,h) {state,ball,player1,player2} =
         , displayMoveable player2 (rect 10 40)
         , toForm scores
             |> move (0, gameHeight/2 - 40)
-        , toForm (if state == Play then spacer 1 1 else txt identity msg)
+        , toForm (if state == IsRunning then spacer 1 1 else txt identity msg)
             |> move (0, 40 - gameHeight/2)
         ]
 
 main =
-    Signal.map2 display Window.dimensions gameState
+    Signal.map2 display Window.dimensions gameRunning
